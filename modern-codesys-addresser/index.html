@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSys Değişken Adresleyici</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="drawer" id="projectDrawer">
+        <div class="drawer-content">
+            <h2>Proje İşlemleri</h2>
+            <div class="drawer-form">
+                <div class="form-group">
+                    <label for="projectName">Proje Adı:</label>
+                    <input type="text" id="projectName" placeholder="Proje Adı" class="project-name">
+                </div>
+                <input type="file" id="projectImport" accept=".csvar" style="display: none">
+                <button id="importBtn" class="action-btn">Proje Yükle</button>
+                <button id="exportBtn" class="action-btn">Projeyi Kaydet</button>
+            </div>
+            <button class="drawer-close" id="drawerClose">&times;</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <button id="projectMenuBtn" class="menu-btn">☰</button>
+            <div class="title-section">
+                <h1>CodeSys Değişken Adresleyici</h1>
+                <div id="activeProject" class="project-info"></div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="startAddress">Başlangıç Adresi:</label>
+            <input type="number" id="startAddress" min="0" value="0">
+        </div>
+        <div class="text-areas">
+            <div class="input-area">
+                <h2>Giriş</h2>
+                <textarea id="inputText" placeholder="Değişkenleri buraya girin..."></textarea>
+            </div>
+            <div class="output-area">
+                <div class="output-header">
+                    <h2>Çıkış</h2>
+                    <div class="output-tabs">
+                        <button class="tab-btn active" data-tab="variables">Değişkenler</button>
+                        <button class="tab-btn" data-tab="definitions">Tanımlamalar</button>
+                        <button class="tab-btn" data-tab="definitions2">Tanım-2</button>
+                        <button class="tab-btn" data-tab="creation">Oluşturma</button>
+                    </div>
+                </div>
+                <div class="tab-content active" id="variables">
+                    <textarea id="outputVariables" readonly></textarea>
+                </div>
+                <div class="tab-content" id="definitions">
+                    <textarea id="outputDefinitions" readonly></textarea>
+                </div>
+                <div class="tab-content" id="definitions2">
+                    <textarea id="outputDefinitions2" readonly></textarea>
+                </div>
+                <div class="tab-content" id="creation">
+                    <textarea id="outputCreation" readonly></textarea>
+                </div>
+            </div>
+        </div>
+        <button id="processBtn" class="process-btn">İşle</button>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script src="codesys.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
