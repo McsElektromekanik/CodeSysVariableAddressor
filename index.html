@@ -37,29 +37,44 @@
         </div>
         <div class="text-areas">
             <div class="input-area">
-                <h2>Giriş</h2>
-                <textarea id="inputText" placeholder="Değişkenleri buraya girin..."></textarea>
+                <div class="output-header">
+                    <h2>Giriş</h2>
+                    <div class="output-tabs">
+                        <label style="align-self: center;">
+                            <input type="checkbox" id="sortCheckbox" />
+                            <span>Sırala</span>
+                        </label>
+                        <button class="tab-btn active" data-tab="rawInputTab" data-tab-grp="1">Ham</button>
+                        <button class="tab-btn" data-tab="inputTab" data-tab-grp="1">İşlenmiş</button>
+                    </div>
+                </div>
+                <div class="tab-content active" id="rawInputTab" data-tab-grp="1">
+                    <textarea id="rawInputText" placeholder="Değişkenleri buraya girin..."></textarea>
+                </div>
+                <div class="tab-content" id="inputTab" data-tab-grp="1">
+                    <textarea id="inputText" readonly></textarea>
+                </div>
             </div>
             <div class="output-area">
                 <div class="output-header">
                     <h2>Çıkış</h2>
                     <div class="output-tabs">
-                        <button class="tab-btn active" data-tab="variables">Değişkenler</button>
-                        <button class="tab-btn" data-tab="definitions">Tanımlamalar</button>
-                        <button class="tab-btn" data-tab="definitions2">Tanım-2</button>
-                        <button class="tab-btn" data-tab="creation">Oluşturma</button>
+                        <button data-tab-grp="2" class="tab-btn active" data-tab="variables">Değişkenler</button>
+                        <button data-tab-grp="2" class="tab-btn" data-tab="definitions">Tanımlamalar</button>
+                        <button data-tab-grp="2" class="tab-btn" data-tab="definitions2">Tanım-2</button>
+                        <button data-tab-grp="2" class="tab-btn" data-tab="creation">Oluşturma</button>
                     </div>
                 </div>
-                <div class="tab-content active" id="variables">
+                <div data-tab-grp="2" class="tab-content active" id="variables">
                     <textarea id="outputVariables" readonly></textarea>
                 </div>
-                <div class="tab-content" id="definitions">
+                <div data-tab-grp="2" class="tab-content" id="definitions">
                     <textarea id="outputDefinitions" readonly></textarea>
                 </div>
-                <div class="tab-content" id="definitions2">
+                <div data-tab-grp="2" class="tab-content" id="definitions2">
                     <textarea id="outputDefinitions2" readonly></textarea>
                 </div>
-                <div class="tab-content" id="creation">
+                <div data-tab-grp="2" class="tab-content" id="creation">
                     <textarea id="outputCreation" readonly></textarea>
                 </div>
             </div>
