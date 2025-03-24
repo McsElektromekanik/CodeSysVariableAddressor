@@ -255,6 +255,7 @@ textarea {
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 1000;
+  pointer-events: none;
 }
 
 .toast.show {
