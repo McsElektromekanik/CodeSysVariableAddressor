@@ -154,7 +154,7 @@ class CodeSysVariable {
         const varType = this.codeSysType === CodeSysType.Dint ? 'DINT' : 
                        this.codeSysType === CodeSysType.Int ? 'INT' : 'REAL';
         
-        return `VariableHelper.Define("${this.name} AT%${adrType}${this.wordAddress} : ${varType}")`;
+        return `VariableHelper.Define("${this.name} AT%${adrType}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)} : ${varType}")`;
     }
 
     getDisplayName() {
@@ -169,7 +169,7 @@ class BoolCodeSysVariable extends CodeSysVariable {
     }
 
     getVarType() {
-        return `VariableHelper.Define("${this.name} AT%MX${this.wordAddress}.${this.bitNumber} : BOOL")`;
+        return `VariableHelper.Define("${this.name} AT%MX${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}.${this.bitNumber} : BOOL")`;
     }
 
     getDisplayName() {
