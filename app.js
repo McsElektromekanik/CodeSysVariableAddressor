@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ${variables
       .map(
         (v) =>
-          `${v.name} = "${v.name}"`
+          `${v.name}"`
       )
       .join(",\n")}
       }`;
