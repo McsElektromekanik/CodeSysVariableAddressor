@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const outputVariables = document.getElementById("outputVariables");
   const outputDefinitions = document.getElementById("outputDefinitions");
   const outputDefinitions2 = document.getElementById("outputDefinitions2");
+  const enum_ = document.getElementById("enum");
   const outputCreation = document.getElementById("outputCreation");
   const processBtn = document.getElementById("processBtn");
   const startAddress = document.getElementById("startAddress");
@@ -299,6 +300,16 @@ document.addEventListener("DOMContentLoaded", () => {
           } { get; set; } = ${v.getVariableCreationString2()};`
       )
       .join("\n");
+
+      enum_.value = `public enum Enum 
+      {
+      ${variables
+      .map(
+        (v) =>
+          `${v.name} = "${v.name}"`
+      )
+      .join(",\n")}
+      }`;
 
     outputCreation.value = variables
       .map((v) => v.getVariableCreationString())
