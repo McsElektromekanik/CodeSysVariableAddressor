@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ${variables
       .map(
         (v) =>
-          `${enumOnEk}${v.name}"`
+          `${enumOnEk}${v.name}`
       )
       .join(",\n")}
       }`;
