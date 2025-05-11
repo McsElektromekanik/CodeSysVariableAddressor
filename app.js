@@ -301,12 +301,13 @@ document.addEventListener("DOMContentLoaded", () => {
       )
       .join("\n");
 
+      const enumOnEk = document.querySelector("#enumOnEk").value ?? "";
       outputEnum.value = `public enum Enum 
       {
       ${variables
       .map(
         (v) =>
-          `${v.name}"`
+          `${enumOnEk}${v.name}"`
       )
       .join(",\n")}
       }`;
