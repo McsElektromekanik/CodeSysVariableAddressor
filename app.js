@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const rawInputText = document.getElementById("rawInputText");
+  const rawInputReadText = document.getElementById("rawInputReadText");
   const inputText = document.getElementById("inputText");
   const sortCheckbox = document.getElementById("sortCheckbox");
   const outputVariables = document.getElementById("outputVariables");
@@ -44,6 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
       name: projectName.value,
       startAddress: startAddress.value,
       input: rawInputText.value,
+      inputRead: rawInputReadText.value,
+      sort: sortCheckbox.checked,
       variables: outputVariables.value,
       definitions: outputDefinitions.value,
       definitions2: outputDefinitions2.value,
@@ -164,8 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Aktif içeriği güncelle
       tabContents.forEach((content) => {
-        if(content.dataset.tabGrp === tabGrp)
-            content.classList.remove("active");
+        if (content.dataset.tabGrp === tabGrp)
+          content.classList.remove("active");
         if (content.id === tabId && content.dataset.tabGrp === tabGrp) {
           content.classList.add("active");
         }
@@ -198,6 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
             projectName.value = projectData.name || "";
             startAddress.value = projectData.startAddress || "0";
             rawInputText.value = projectData.input || "";
+            rawInputReadText.value = projectData.inputRead || "";
+            sortCheckbox.checked = projectData.sort || false;
             outputVariables.value = projectData.variables || "";
             outputDefinitions.value = projectData.definitions || "";
             outputDefinitions2.value = projectData.definitions2 || "";
@@ -237,27 +242,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function processRawInput() {
-    inputText.value = sortCheckbox.checked
-      ? sortVars(rawInputText.value)
-      : rawInputText.value;
+    const str = rawInputText.value + "\n" + rawInputReadText.value;
+    inputText.value = sortCheckbox.checked ? sortVars(str) : str;
   }
 
-  // İşleme butonu tıklama olayı
-  processBtn.addEventListener("click", () => {
-    processRawInput();
-    const lines = inputText.value.split("\n");
-    let lastWord = parseInt(startAddress.value) || 0;
+  function getVars(txt, addr) {
+    const lines = txt.split("\n");
+    let lastWord = addr;
     let lastBit = 0;
     let lastBitWas15 = false;
     let lastWasBool = false;
     const variables = [];
-
     // Değişkenleri işle
     lines.forEach((line) => {
       if (line.trim()) {
         try {
           const variable = CodeSysVariable.getVariable(line);
-          
+
           if (variable instanceof BoolCodeSysVariable) {
             variable.wordAddress = lastWord;
             variable.bitNumber = lastBit;
@@ -267,12 +268,11 @@ document.addEventListener("DOMContentLoaded", () => {
               lastBitWas15 = true;
               lastBit = 0;
               lastWord++;
-            }else{
+            } else {
               lastBitWas15 = false;
             }
           } else {
-            if(lastWasBool && !lastBitWas15)
-              lastWord++;
+            if (lastWasBool && !lastBitWas15) lastWord++;
             lastWasBool = false;
             lastBitWas15 = false;
             lastBit = 0;
@@ -294,36 +294,45 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+    return variables;
+  }
 
+  // İşleme butonu tıklama olayı
+  processBtn.addEventListener("click", () => {
+    processRawInput();
+    const variables = getVars(
+      inputText.value,
+      parseInt(startAddress.value) || 0
+    );
+
+    const readVariables = getVars(
+      rawInputReadText.value,
+      parseInt(startAddress.value) || 0
+    );
     // Çıktıları güncelle
     outputVariables.value = variables.map((v) => v.getDisplayName()).join("\n");
 
     outputDefinitions.value = variables
       .map((v) => `public ${v.getVariableDefinitionString()}`)
       .join("\n");
-
+    const read = (v) => readVariables.findIndex((r) => r.name === v.name) >= 0;
     outputDefinitions2.value = variables
       .map(
         (v) =>
           `public IVariable ${
             v.name
-          } { get; set; } = ${v.getVariableCreationString2()};`
+          } { get; set; } = ${v.getVariableCreationString2(read(v))};`
       )
       .join("\n");
 
-      const enumOnEk = document.querySelector("#enumOnEk").value ?? "";
-      outputEnum.value = `public enum Enum 
+    const enumOnEk = document.querySelector("#enumOnEk").value ?? "";
+    outputEnum.value = `public enum Enum 
       {
-      ${variables
-      .map(
-        (v) =>
-          `${enumOnEk}${v.name}`
-      )
-      .join(",\n")}
+      ${variables.map((v) => `${enumOnEk}${v.name}`).join(",\n")}
       }`;
 
     outputCreation.value = variables
-      .map((v) => v.getVariableCreationString())
+      .map((v) => v.getVariableCreationString(read(v)))
       .join("\n");
   });
 });

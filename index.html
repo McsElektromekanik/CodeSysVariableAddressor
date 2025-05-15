@@ -50,12 +50,22 @@
                             <input type="checkbox" id="sortCheckbox" />
                             <span>Sırala</span>
                         </label>
-                        <button class="tab-btn active" data-tab="rawInputTab" data-tab-grp="1">Ham</button>
+                        <button class="tab-btn active" data-tab="inputsTab" data-tab-grp="1">Ham</button>
                         <button class="tab-btn" data-tab="inputTab" data-tab-grp="1">İşlenmiş</button>
                     </div>
                 </div>
-                <div class="tab-content active" id="rawInputTab" data-tab-grp="1">
-                    <textarea id="rawInputText" placeholder="Değişkenleri buraya girin..."></textarea>
+                <div class="tab-content active" id="inputsTab" data-tab-grp="1">
+                        <button class="tab-btn active" data-tab="rawInputTab" data-tab-grp="inputsGrp">Okunmayan</button>
+                        <button class="tab-btn" data-tab="rawInputReadTab" data-tab-grp="inputsGrp">Okunan</button>
+
+                    <div class="tab-content active" id="rawInputTab" data-tab-grp="inputsGrp">
+                        <span>Okunmayan Değişkenler: </span>
+                        <textarea id="rawInputText" placeholder="Değişkenleri buraya girin..."></textarea>
+                    </div>
+                    <div class="tab-content" id="rawInputReadTab" data-tab-grp="inputsGrp">
+                        <span>Okunan Değişkenler: </span>
+                        <textarea id="rawInputReadText" placeholder="Değişkenleri buraya girin..."></textarea>
+                    </div>
                 </div>
                 <div class="tab-content" id="inputTab" data-tab-grp="1">
                     <textarea id="inputText" readonly></textarea>
