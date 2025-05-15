@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeSys Değişken Adresleyici</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="drawer" id="projectDrawer">
         <div class="drawer-content">
@@ -35,6 +37,10 @@
             <label for="startAddress">Başlangıç Adresi:</label>
             <input type="number" id="startAddress" min="0" value="0">
         </div>
+        <div class="input-group">
+            <label for="enumOnEk">Enum Ön Ek:</label>
+            <input type="text" id="enumOnEk">
+        </div>
         <div class="text-areas">
             <div class="input-area">
                 <div class="output-header">
@@ -62,6 +68,7 @@
                         <button data-tab-grp="2" class="tab-btn active" data-tab="variables">Değişkenler</button>
                         <button data-tab-grp="2" class="tab-btn" data-tab="definitions">Tanımlamalar</button>
                         <button data-tab-grp="2" class="tab-btn" data-tab="definitions2">Tanım-2</button>
+                        <button data-tab-grp="2" class="tab-btn" data-tab="enum">Enum</button>
                         <button data-tab-grp="2" class="tab-btn" data-tab="creation">Oluşturma</button>
                     </div>
                 </div>
@@ -74,6 +81,9 @@
                 <div data-tab-grp="2" class="tab-content" id="definitions2">
                     <textarea id="outputDefinitions2" readonly></textarea>
                 </div>
+                <div data-tab-grp="2" class="tab-content" id="enum">
+                    <textarea id="outputEnum" readonly></textarea>
+                </div>
                 <div data-tab-grp="2" class="tab-content" id="creation">
                     <textarea id="outputCreation" readonly></textarea>
                 </div>
@@ -85,4 +95,5 @@
     <script src="codesys.js"></script>
     <script src="app.js"></script>
 </body>
-</html> 
+
+</html>
