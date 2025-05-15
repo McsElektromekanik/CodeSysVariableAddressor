@@ -248,6 +248,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const lines = inputText.value.split("\n");
     let lastWord = parseInt(startAddress.value) || 0;
     let lastBit = 0;
+    let lastBitWas15 = false;
+    let lastWasBool = false;
     const variables = [];
 
     // Değişkenleri işle
@@ -255,16 +257,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (line.trim()) {
         try {
           const variable = CodeSysVariable.getVariable(line);
-
+          
           if (variable instanceof BoolCodeSysVariable) {
             variable.wordAddress = lastWord;
             variable.bitNumber = lastBit;
             lastBit++;
+            lastWasBool = true;
             if (lastBit > 15) {
+              lastBitWas15 = true;
               lastBit = 0;
               lastWord++;
+            }else{
+              lastBitWas15 = false;
             }
           } else {
+            if(lastWasBool && !lastBitWas15)
+              lastWord++;
+            lastWasBool = false;
+            lastBitWas15 = false;
             lastBit = 0;
             if (
               variable.codeSysType === CodeSysType.Real ||
