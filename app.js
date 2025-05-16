@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
       parseInt(startAddress.value) || 0
     );
     // Çıktıları güncelle
-    outputVariables.value = variables.map((v) => v.getDisplayName()).join("\n");
+    outputVariables.value = variables.map((v) => `\t${v.getDisplayName()}`).join("\n");
 
     outputDefinitions.value = variables
       .map((v) => `public ${v.getVariableDefinitionString()}`)
