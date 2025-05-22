@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function processRawInput() {
     const str = rawInputText.value + "\n" + rawInputReadText.value;
-    inputText.value = sortCheckbox.checked ? sortVars(rawInputReadText.value) + sortVars(rawInputText.value) : str;
+    inputText.value = sortCheckbox.checked ? sortVars(rawInputReadText.value) + "\n" + sortVars(rawInputText.value) : str;
   }
 
   function getVars(txt, addr) {
