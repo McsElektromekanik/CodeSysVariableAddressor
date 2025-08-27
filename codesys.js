@@ -252,4 +252,5 @@ class FloatShortCodeSysVariable extends CodeSysVariable {
 // Dışa aktarma
 window.CodeSysVariable = CodeSysVariable;
 window.BoolCodeSysVariable = BoolCodeSysVariable;
+window.FloatShortCodeSysVariable = FloatShortCodeSysVariable;
 window.CodeSysType = CodeSysType;
