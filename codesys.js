@@ -1,208 +1,252 @@
 const CodeSysType = {
-  NotFound: "NotFound",
-  Int: "Int",
-  Real: "Real",
-  Bool: "Bool",
-  Dint: "Dint",
+    NotFound: "NotFound",
+    Int: "Int",
+    Real: "Real",
+    Bool: "Bool",
+    Dint: "Dint",
+    RealInt: "RealInt",
 };
 
 const typeId = {
-  [CodeSysType.Bool]: "MX",
-  [CodeSysType.Int]: "MW",
-  [CodeSysType.Real]: "MD",
-  [CodeSysType.Dint]: "MD",
+    [CodeSysType.Bool]: "MX",
+    [CodeSysType.Int]: "MW",
+    [CodeSysType.Real]: "MD",
+    [CodeSysType.Dint]: "MD",
+    [CodeSysType.RealInt]: "MW",
 };
 
 const stringTypePairs = {
-  int: CodeSysType.Int,
-  real: CodeSysType.Real,
-  bool: CodeSysType.Bool,
-  dint: CodeSysType.Dint,
+    int: CodeSysType.Int,
+    real: CodeSysType.Real,
+    bool: CodeSysType.Bool,
+    dint: CodeSysType.Dint,
+    realint: CodeSysType.RealInt,
 };
 
 const replacements = {
-  İ: "I",
-  ı: "i",
-  ü: "u",
-  Ü: "U",
-  ö: "o",
-  Ö: "O",
-  ç: "c",
-  Ç: "C",
-  ğ: "g",
-  Ğ: "G",
-  Ş: "S",
-  ş: "s",
+    İ: "I",
+    ı: "i",
+    ü: "u",
+    Ü: "U",
+    ö: "o",
+    Ö: "O",
+    ç: "c",
+    Ç: "C",
+    ğ: "g",
+    Ğ: "G",
+    Ş: "S",
+    ş: "s",
 };
 
 class CodeSysVariable {
-  constructor() {
-    this.name = "";
-    this.wordAddress = -1;
-    this.codeSysType = CodeSysType.NotFound;
-  }
-
-  static getVariable(displayName) {
-    const name = this.decomposeName(displayName);
-    const type = this.decomposeCodeSysType(displayName);
-    const address = this.decomposeAddress(displayName);
-
-    let variable;
-    if (type === CodeSysType.Bool) {
-      variable = new BoolCodeSysVariable();
-      const bitNumber = this.decomposeBitNumber(displayName);
-      variable.bitNumber = bitNumber;
-    } else {
-      variable = new CodeSysVariable();
+    constructor() {
+        this.name = "";
+        this.wordAddress = -1;
+        this.codeSysType = CodeSysType.NotFound;
     }
 
-    variable.name = name;
-    variable.codeSysType = type;
-    variable.wordAddress = address;
+    static getVariable(displayName) {
+        const name = this.decomposeName(displayName);
+        const type = this.decomposeCodeSysType(displayName);
+        const address = this.decomposeAddress(displayName);
+        
+        let variable;
+        if (type === CodeSysType.Bool) {
+            variable = new BoolCodeSysVariable();
+            const bitNumber = this.decomposeBitNumber(displayName);
+            variable.bitNumber = bitNumber;
+        } else if (type === CodeSysType.RealInt) {
+            variable = new FloatShortCodeSysVariable();
+            const decimalPlaces = this.decomposeDecimalPlaces(displayName);
+            variable.decimalPlaces = decimalPlaces;
+        } else {
+            variable = new CodeSysVariable();
+        }
 
-    return variable;
-  }
+        variable.name = name;
+        variable.codeSysType = type;
+        variable.wordAddress = address;
 
-  static decomposeName(displayName) {
-    let buffer = displayName.trim();
-    if (buffer.includes(":")) {
-      buffer = buffer.split(":")[0];
+        return variable;
     }
-    const whiteSpaceIndex = buffer.search(/\s/);
-    return whiteSpaceIndex > 0 ? buffer.substring(0, whiteSpaceIndex) : buffer;
-  }
 
-  static decomposeCodeSysType(displayName) {
-    let buffer = displayName.trim();
-    if (buffer.includes(":")) {
-      const split = buffer.split(":");
-      buffer = split[1].trim().replace(";", "").toLowerCase();
+    static decomposeName(displayName) {
+        let buffer = displayName.trim();
+        if (buffer.includes(":")) {
+            buffer = buffer.split(":")[0];
+        }
+        const whiteSpaceIndex = buffer.search(/\s/);
+        return whiteSpaceIndex > 0 ? buffer.substring(0, whiteSpaceIndex) : buffer;
     }
-    return stringTypePairs[buffer] || CodeSysType.NotFound;
-  }
 
-  static decomposeAddress(displayName) {
-    let buffer = displayName.trim();
-    if (buffer.includes(":")) {
-      buffer = buffer.split(":")[0];
-      if (buffer.includes("%")) {
-        buffer = buffer.split("%")[1];
-      }
-      if (buffer.includes(".")) {
-        buffer = buffer.split(".")[0];
-      }
+    static decomposeCodeSysType(displayName) {
+        let buffer = displayName.trim();
+        if (buffer.includes(":")) {
+            const split = buffer.split(":");
+            buffer = split[1].trim().replace(";", "").toLowerCase();
+            if (buffer.startsWith("realint")) buffer = "realint";
+        }
+        return stringTypePairs[buffer] || CodeSysType.NotFound;
     }
-    buffer = buffer.trim();
-    let result = parseInt(buffer.substring(2)) || -1;
 
-    const type = this.decomposeCodeSysType(displayName);
-    if (type === CodeSysType.Bool) {
-      result = Math.floor(result / 2);
-    } else if (type === CodeSysType.Real || type === CodeSysType.Dint) {
-      result *= 2;
+    static decomposeDecimalPlaces(displayName) {
+        let result = 0;
+        try {
+            let buffer = displayName.trim();
+            if (buffer.includes(":")) {
+                const split = buffer.split(":");
+                buffer = split[1]
+                    .trim()
+                    .replace(";", "")
+                    .replace("realint", "")
+                    .replace("(", "")
+                    .replace(")", "")
+                    .toLowerCase();
+                result = +buffer;
+            }
+        } catch {}
+        if (isNaN(result)) result = 0;
+        return result;
     }
-    return result;
-  }
 
-  static decomposeBitNumber(displayName) {
-    let buffer = displayName.trim();
-    if (buffer.includes(":")) {
-      buffer = buffer.split(":")[0];
-      if (buffer.includes("%")) {
-        buffer = buffer.split("%")[1];
-      }
-      if (buffer.includes(".")) {
-        buffer = buffer.split(".")[1];
-      }
+    static decomposeAddress(displayName) {
+        let buffer = displayName.trim();
+        if (buffer.includes(":")) {
+            buffer = buffer.split(":")[0];
+            if (buffer.includes("%")) {
+                buffer = buffer.split("%")[1];
+            }
+            if (buffer.includes(".")) {
+                buffer = buffer.split(".")[0];
+            }
+        }
+        buffer = buffer.trim();
+        let result = parseInt(buffer.substring(2)) || -1;
+
+        const type = this.decomposeCodeSysType(displayName);
+        if (type === CodeSysType.Bool) {
+            result = Math.floor(result / 2);
+        } else if (type === CodeSysType.Real || type === CodeSysType.Dint) {
+            result *= 2;
+        }
+        return result;
     }
-    buffer = buffer.trim();
-    return parseInt(buffer) || -1;
-  }
 
-  static getATDeclaration(type) {
-    return typeId[type] || "";
-  }
-
-  static wordAddressToString(address, type) {
-    let result = address.toString();
-    if (type === CodeSysType.Bool) {
-      result = (address * 2).toString();
-    } else if (type === CodeSysType.Real || type === CodeSysType.Dint) {
-      result = Math.floor(address / 2).toString();
+    static decomposeBitNumber(displayName) {
+        let buffer = displayName.trim();
+        if (buffer.includes(":")) {
+            buffer = buffer.split(":")[0];
+            if (buffer.includes("%")) {
+                buffer = buffer.split("%")[1];
+            }
+            if (buffer.includes(".")) {
+                buffer = buffer.split(".")[1];
+            }
+        }
+        buffer = buffer.trim();
+        return parseInt(buffer) || -1;
     }
-    return result;
-  }
 
-  fitCharsEnglish(str) {
-    return str.replace(/[İıüÜöÖçÇğĞŞş]/g, (char) => replacements[char] || char);
-  }
+    static getATDeclaration(type) {
+        return typeId[type] || "";
+    }
 
-  getVariableDefinitionString() {
-    return `IVariable ${this.name}{get;set;}`;
-  }
+    static wordAddressToString(address, type) {
+        let result = address.toString();
+        if (type === CodeSysType.Bool) {
+            result = (address * 2).toString();
+        } else if (type === CodeSysType.Real || type === CodeSysType.Dint) {
+            result = Math.floor(address / 2).toString();
+        }
+        return result;
+    }
 
-  getVariableCreationString(read = null) {
-    return `${this.name}=${this.getVarType(read)}`;
-  }
+    fitCharsEnglish(str) {
+        return str.replace(/[İıüÜöÖçÇğĞŞş]/g, (char) => replacements[char] || char);
+    }
 
-  getVariableCreationString2(read = null) {
-    return `${this.getVarType(read)}`;
-  }
+    getVariableDefinitionString() {
+        return `IVariable ${this.name}{get;set;}`;
+    }
 
-  getVarType(read = null) {
-    const adrType = this.codeSysType === CodeSysType.Int ? "MW" : "MD";
-    const varType =
-      this.codeSysType === CodeSysType.Dint
-        ? "DINT"
-        : this.codeSysType === CodeSysType.Int
-        ? "INT"
-        : "REAL";
+    getVariableCreationString(read = null) {
+        return `${this.name}=${this.getVarType(read)}`;
+    }
 
-    return `VariableHelper.Define("${
-      this.name
-    } AT%${adrType}${CodeSysVariable.wordAddressToString(
-      this.wordAddress,
-      this.codeSysType
-    )} : ${varType}"${read ? ", true" : ""})`;
-  }
+    getVariableCreationString2(read = null) {
+        return `${this.getVarType(read)}`;
+    }
 
-  getDisplayName() {
-    return `${this.fitCharsEnglish(
-      this.name
-    )} AT%${CodeSysVariable.getATDeclaration(
-      this.codeSysType
-    )}${CodeSysVariable.wordAddressToString(
-      this.wordAddress,
-      this.codeSysType
-    )}:${this.codeSysType};`;
-  }
+    getVarType(read = null) {
+        const adrType =
+            this.codeSysType === CodeSysType.Int || this.codeSysType === CodeSysType.RealInt
+                ? "MW"
+                : "MD";
+        const varType =
+            this.codeSysType === CodeSysType.Dint
+                ? "DINT"
+                : this.codeSysType === CodeSysType.Int || this.codeSysType === CodeSysType.RealInt
+                ? "INT"
+                : "REAL";
+
+        return `VariableHelper.Define("${
+            this.name
+        } AT%${adrType}${CodeSysVariable.wordAddressToString(
+            this.wordAddress,
+            this.codeSysType,
+        )} : ${varType}"${read ? ", true" : ""})`;
+    }
+
+    getDisplayName() {
+        return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
+            this.codeSysType,
+        )}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}:${
+            this.codeSysType
+        };`;
+    }
 }
 
 class BoolCodeSysVariable extends CodeSysVariable {
-  constructor() {
-    super();
-    this.bitNumber = -1;
-  }
+    constructor() {
+        super();
+        this.bitNumber = -1;
+    }
 
-  getVarType(read = null) {
-    return `VariableHelper.Define("${
-      this.name
-    } AT%MX${CodeSysVariable.wordAddressToString(
-      this.wordAddress,
-      this.codeSysType
-    )}.${this.bitNumber} : BOOL"${read ? ", true" : ""})`;
-  }
+    getVarType(read = null) {
+        return `VariableHelper.Define("${this.name} AT%MX${CodeSysVariable.wordAddressToString(
+            this.wordAddress,
+            this.codeSysType,
+        )}.${this.bitNumber} : BOOL"${read ? ", true" : ""})`;
+    }
 
-  getDisplayName() {
-    return `${this.fitCharsEnglish(
-      this.name
-    )} AT%${CodeSysVariable.getATDeclaration(
-      this.codeSysType
-    )}${CodeSysVariable.wordAddressToString(
-      this.wordAddress,
-      this.codeSysType
-    )}.${this.bitNumber}:${this.codeSysType};`;
-  }
+    getDisplayName() {
+        return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
+            this.codeSysType,
+        )}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}.${
+            this.bitNumber
+        }:${this.codeSysType};`;
+    }
+}
+
+class FloatShortCodeSysVariable extends CodeSysVariable {
+    constructor() {
+        super();
+        this.decimalPlaces = 0;
+    }
+
+    getVarType(read = null) {
+        return `VariableHelper.Define("${this.name} AT%MW${CodeSysVariable.wordAddressToString(
+            this.wordAddress,
+            this.codeSysType,
+        )} : RealInt(${this.decimalPlaces})"${read ? ", true" : ""})`;
+    }
+
+    getDisplayName() {
+      const codeSysType = this.codeSysType === "RealInt" ? "Int" : this.codeSysType;
+        return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
+            this.codeSysType,
+        )}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}:${codeSysType};`;
+    }
 }
 
 // Dışa aktarma
