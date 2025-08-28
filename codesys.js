@@ -90,6 +90,7 @@ class CodeSysVariable {
     }
 
     static decomposeDecimalPlaces(displayName) {
+        const str = displayName.trim();
         let result = 0;
         const re = /realint\(\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*\)/i;
         const m = str.match(re);
