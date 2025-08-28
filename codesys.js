@@ -49,7 +49,7 @@ class CodeSysVariable {
         const name = this.decomposeName(displayName);
         const type = this.decomposeCodeSysType(displayName);
         const address = this.decomposeAddress(displayName);
-        
+
         let variable;
         if (type === CodeSysType.Bool) {
             variable = new BoolCodeSysVariable();
@@ -91,21 +91,16 @@ class CodeSysVariable {
 
     static decomposeDecimalPlaces(displayName) {
         let result = 0;
-        try {
-            let buffer = displayName.trim();
-            if (buffer.includes(":")) {
-                const split = buffer.split(":");
-                buffer = split[1]
-                    .trim()
-                    .replace(";", "")
-                    .replace("realint", "")
-                    .replace("(", "")
-                    .replace(")", "")
-                    .toLowerCase();
-                result = +buffer;
-            }
-        } catch {}
-        if (isNaN(result)) result = 0;
+        const re = /realint\(\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*\)/i;
+        const m = str.match(re);
+        if (m) {
+            const x = parseInt(m[1], 10); // veya Number(m[1])
+            result = x;
+            console.log(x); // -123
+        } else {
+            result = 0;
+            console.log("eşleşme yok veya X sayı değil");
+        }
         return result;
     }
 
@@ -242,10 +237,13 @@ class FloatShortCodeSysVariable extends CodeSysVariable {
     }
 
     getDisplayName() {
-      const codeSysType = this.codeSysType === "RealInt" ? "Int" : this.codeSysType;
+        const codeSysType = this.codeSysType === "RealInt" ? "Int" : this.codeSysType;
         return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
             this.codeSysType,
-        )}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}:${codeSysType};`;
+        )}${CodeSysVariable.wordAddressToString(
+            this.wordAddress,
+            this.codeSysType,
+        )}:${codeSysType};`;
     }
 }
 
