@@ -28,6 +28,12 @@ Değişkenler aşağıdaki formatta olmalıdır:
 DeğişkenAdı : TİP;
 ```
 
+Metadata tag kullanmak isterseniz opsiyonel üçüncü alanı ekleyebilirsiniz:
+
+```
+DeğişkenAdı : TİP : MetadataTags;
+```
+
 Örnek:
 ```
 Motor1_Çalışıyor : BOOL;

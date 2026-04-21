@@ -43,12 +43,14 @@ class CodeSysVariable {
         this.name = "";
         this.wordAddress = -1;
         this.codeSysType = CodeSysType.NotFound;
+        this.metadataTags = "";
     }
 
     static getVariable(displayName) {
         const name = this.decomposeName(displayName);
         const type = this.decomposeCodeSysType(displayName);
         const address = this.decomposeAddress(displayName);
+        const metadataTags = this.decomposeMetadataTags(displayName);
 
         let variable;
         if (type === CodeSysType.Bool) {
@@ -66,6 +68,7 @@ class CodeSysVariable {
         variable.name = name;
         variable.codeSysType = type;
         variable.wordAddress = address;
+        variable.metadataTags = metadataTags;
 
         return variable;
     }
@@ -87,6 +90,16 @@ class CodeSysVariable {
             if (buffer.startsWith("realint")) buffer = "realint";
         }
         return stringTypePairs[buffer] || CodeSysType.NotFound;
+    }
+
+    static decomposeMetadataTags(displayName) {
+        const buffer = displayName.trim();
+        if (!buffer.includes(":")) return "";
+        const split = buffer.split(":");
+        if (split.length < 3) return "";
+        const raw = split.slice(2).join(":").trim();
+        if (!raw) return "";
+        return raw.replace(/;$/, "").trim();
     }
 
     static decomposeDecimalPlaces(displayName) {
@@ -185,12 +198,14 @@ class CodeSysVariable {
                 ? "INT"
                 : "REAL";
 
+        const metadataArg =
+            read || this.metadataTags ? `, "${this.metadataTags || ""}"` : "";
         return `VariableHelper.Define("${
             this.name
         } AT%${adrType}${CodeSysVariable.wordAddressToString(
             this.wordAddress,
             this.codeSysType,
-        )} : ${varType}"${read ? ", true" : ""})`;
+        )} : ${varType}"${metadataArg}${read ? ", true" : ""})`;
     }
 
     getDisplayName() {
@@ -209,10 +224,12 @@ class BoolCodeSysVariable extends CodeSysVariable {
     }
 
     getVarType(read = null) {
+        const metadataArg =
+            read || this.metadataTags ? `, "${this.metadataTags || ""}"` : "";
         return `VariableHelper.Define("${this.name} AT%MX${CodeSysVariable.wordAddressToString(
             this.wordAddress,
             this.codeSysType,
-        )}.${this.bitNumber} : BOOL"${read ? ", true" : ""})`;
+        )}.${this.bitNumber} : BOOL"${metadataArg}${read ? ", true" : ""})`;
     }
 
     getDisplayName() {
@@ -231,10 +248,12 @@ class FloatShortCodeSysVariable extends CodeSysVariable {
     }
 
     getVarType(read = null) {
+        const metadataArg =
+            read || this.metadataTags ? `, "${this.metadataTags || ""}"` : "";
         return `VariableHelper.Define("${this.name} AT%MW${CodeSysVariable.wordAddressToString(
             this.wordAddress,
             this.codeSysType,
-        )} : RealInt(${this.decimalPlaces})"${read ? ", true" : ""})`;
+        )} : RealInt(${this.decimalPlaces})"${metadataArg}${read ? ", true" : ""})`;
     }
 
     getDisplayName() {
