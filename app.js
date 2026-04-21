@@ -321,10 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("\n");
 
         const enumOnEk = document.querySelector("#enumOnEk").value ?? "";
-        outputEnum.value = `public enum Enum 
-      {
-      ${variables.map((v) => `${enumOnEk}${v.name}`).join(",\n")}
-      }`;
+        outputEnum.value = `${variables.map((v) => `${enumOnEk}${v.name}`).join(",\n")}`;
 
         outputCreation.value = variables
             .map((v) => v.getVariableCreationString(read(v)))
