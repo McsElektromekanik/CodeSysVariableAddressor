@@ -5,6 +5,7 @@ const CodeSysType = {
     Bool: "Bool",
     Dint: "Dint",
     RealInt: "RealInt",
+    BoolInt: "Int",
 };
 
 const typeId = {
@@ -13,6 +14,7 @@ const typeId = {
     [CodeSysType.Real]: "MD",
     [CodeSysType.Dint]: "MD",
     [CodeSysType.RealInt]: "MW",
+    [CodeSysType.BoolInt]: "MW",
 };
 
 const stringTypePairs = {
@@ -21,6 +23,7 @@ const stringTypePairs = {
     bool: CodeSysType.Bool,
     dint: CodeSysType.Dint,
     realint: CodeSysType.RealInt,
+    boolint: CodeSysType.BoolInt,
 };
 
 const replacements = {
@@ -188,13 +191,13 @@ class CodeSysVariable {
 
     getVarType(read = null) {
         const adrType =
-            this.codeSysType === CodeSysType.Int || this.codeSysType === CodeSysType.RealInt
+            this.codeSysType === CodeSysType.Int || this.codeSysType === CodeSysType.RealInt || this.codeSysType === CodeSysType.BoolInt
                 ? "MW"
                 : "MD";
         const varType =
             this.codeSysType === CodeSysType.Dint
                 ? "DINT"
-                : this.codeSysType === CodeSysType.Int || this.codeSysType === CodeSysType.RealInt
+                : this.codeSysType === CodeSysType.Int || this.codeSysType === CodeSysType.RealInt || this.codeSysType === CodeSysType.BoolInt
                 ? "INT"
                 : "REAL";
 
@@ -257,7 +260,7 @@ class FloatShortCodeSysVariable extends CodeSysVariable {
     }
 
     getDisplayName() {
-        const codeSysType = this.codeSysType === "RealInt" ? "Int" : this.codeSysType;
+        const codeSysType = this.codeSysType === "RealInt" || this.codeSysType === "BoolInt" ? "Int" : this.codeSysType;
         return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
             this.codeSysType,
         )}${CodeSysVariable.wordAddressToString(
