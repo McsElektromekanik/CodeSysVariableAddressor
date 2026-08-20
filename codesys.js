@@ -44,6 +44,7 @@ const replacements = {
 class CodeSysVariable {
     constructor() {
         this.name = "";
+        this.plcName = "";
         this.wordAddress = -1;
         this.codeSysType = CodeSysType.NotFound;
         this.metadataTags = "";
@@ -51,6 +52,7 @@ class CodeSysVariable {
 
     static getVariable(displayName) {
         const name = this.decomposeName(displayName);
+        const plcName = this.decomposePlcName(displayName);
         const type = this.decomposeCodeSysType(displayName);
         const address = this.decomposeAddress(displayName);
         const metadataTags = this.decomposeMetadataTags(displayName);
@@ -69,6 +71,7 @@ class CodeSysVariable {
         }
 
         variable.name = name;
+        variable.plcName = plcName || name;
         variable.codeSysType = type;
         variable.wordAddress = address;
         variable.metadataTags = metadataTags;
@@ -83,6 +86,16 @@ class CodeSysVariable {
         }
         const whiteSpaceIndex = buffer.search(/\s/);
         return whiteSpaceIndex > 0 ? buffer.substring(0, whiteSpaceIndex) : buffer;
+    }
+
+     static decomposePlcName(displayName) {
+        const buffer = displayName.trim();
+        if (!buffer.includes(":")) return "";
+        const split = buffer.split(":");
+        if (split.length < 4) return "";
+        const raw = split.slice(3).join(":").trim();
+        if (!raw) return "";
+        return raw.replace(/;$/, "").trim();
     }
 
     static decomposeCodeSysType(displayName) {
@@ -212,7 +225,7 @@ class CodeSysVariable {
     }
 
     getDisplayName() {
-        return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
+        return `${this.fitCharsEnglish(this.plcName)} AT%${CodeSysVariable.getATDeclaration(
             this.codeSysType,
         )}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}:${
             this.codeSysType
@@ -236,7 +249,7 @@ class BoolCodeSysVariable extends CodeSysVariable {
     }
 
     getDisplayName() {
-        return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
+        return `${this.fitCharsEnglish(this.plcName)} AT%${CodeSysVariable.getATDeclaration(
             this.codeSysType,
         )}${CodeSysVariable.wordAddressToString(this.wordAddress, this.codeSysType)}.${
             this.bitNumber
@@ -261,7 +274,7 @@ class FloatShortCodeSysVariable extends CodeSysVariable {
 
     getDisplayName() {
         const codeSysType = this.codeSysType === "RealInt" || this.codeSysType === "BoolInt" ? "Int" : this.codeSysType;
-        return `${this.fitCharsEnglish(this.name)} AT%${CodeSysVariable.getATDeclaration(
+        return `${this.fitCharsEnglish(this.plcName)} AT%${CodeSysVariable.getATDeclaration(
             this.codeSysType,
         )}${CodeSysVariable.wordAddressToString(
             this.wordAddress,
